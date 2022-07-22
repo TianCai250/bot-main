@@ -1,0 +1,13 @@
+{
+    "masterQQ": [
+        1528674592
+    ],
+    "qq": "2110824941",
+    "password": "wangluo321",
+    "baseUrl": "http://localhost:8080",
+    "verifyKey": "wwwlll",
+    "ruyi_appKey": "379153c2-9334-4022-a21c-2f6710286600",
+    "ruyi_baseUrl": "http://api.ruyi.ai/v1/message",
+    "name": "管管",
+    "sname": "小管管"
+}
