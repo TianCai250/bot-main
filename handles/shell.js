@@ -3,7 +3,7 @@ const {VM, VMScript} = require('vm2')
 const { sendGroupMessage, sendGroupNudge, status } = require('../bot');
 const axios = require('axios');
 const { masterQQ } = require('../config.json');
-const { sleep, textMsg } = require('../utils');
+const { textMsg } = require('../utils');
 const cheerio = require('cheerio');
 
 const current = {
@@ -289,9 +289,15 @@ module.exports = async (data, next) => {
     const { isAtMe, permissionText, id, memberName, groupId, groupName, messageChain, texts } = data
     const text = texts.join("").trim("")
     if(blist.includes(id))return
-    const prompt = text[0]
-    const scriptText = text.substr(1)
-    if (!["#", ">"].includes(prompt)) return next()
+    const prompt = text[0] + text[1];
+    let scriptText = text.substr(2)
+    scriptText = scriptText.replace(/（/g, '(');
+    scriptText = scriptText.replace(/）/g, ')');
+    scriptText = scriptText.replace(/‘|’/g, "'");
+    scriptText = scriptText.replace(/“|”/g, '"');
+    scriptText = scriptText.replace(/；/g, ';');
+    scriptText = scriptText.replace(/，/g, ',');
+    if (!["#", ">", "管管"].includes(prompt)) return next()
     current.groupId = groupId
     current.id = id
     if(/require|eval|Function|import|global/.test(text) || keys.find(item => text.replace(/ /g,'').indexOf(item) > -1)){
@@ -304,7 +310,7 @@ module.exports = async (data, next) => {
         if (!masterQQ.includes(id))  throw new Error("权限不足,非BOT管理员请用>作为提示符") 
         vmAdmin.run(scriptText)
      }
-     if (prompt == ">") {
+     if (prompt == ">" || prompt == "管管") {
         vm.run(scriptText)
      }
      } catch (e) {
