@@ -1,5 +1,5 @@
 const { Message } = require('mirai-js');
-const {VM, VMScript} = require('vm2')
+const { VM, VMScript } = require('vm2');
 const { sendGroupMessage, sendGroupNudge, status } = require('../bot');
 const axios = require('axios');
 const { masterQQ } = require('../config.json');
@@ -126,26 +126,24 @@ const context = {
         _send(textMsg(String(msg)));
     },
     提醒(id, msg, time) {
-        if(!id || !msg || isNaN(time) || time<0) {
+        if (!id || !msg || isNaN(time) || time < 0) {
             _send(textMsg(String('参数错误')));
             return;
         }
         const message = new Message();
         message.addAt(id);
-        message.addText(String(`${time/1000}秒后提醒你${msg}`));
+        message.addText(String(`${time / 1000}秒后提醒你${msg}`));
         _send(message);
-        setTimeout(()=>{
+        setTimeout(() => {
             const message1 = new Message();
             message1.addAt(id);
             message1.addText(String(` ${msg}`));
             _send(message1);
-        },time)
+        }, time);
     },
     async 解释(text) {
         if (!text) return;
-        const res = await axios.get(
-            `https://dict-mobile.iciba.com/interface/index.php?c=word&m=getsuggest&nums=10&is_need_mean=1&word=${text}`,
-        );
+        const res = await axios.get(`https://dict-mobile.iciba.com/interface/index.php?c=word&m=getsuggest&nums=10&is_need_mean=1&word=${text}`);
         if (res.data.status == 1) {
             let msg = res.data.message[0] ? res.data.message[0].paraphrase : '暂无解释';
             _send(textMsg(String(msg)));
@@ -193,11 +191,11 @@ const context = {
     },
     async 今日头条() {
         const { data } = await axios.get('http://is.snssdk.com/api/news/feed/v51/');
-        let msg = ''
+        let msg = '';
         if (data.message == 'success' && data.data.length > 0) {
             let lens = data.data.length > 5 ? 5 : data.data.length;
             for (let i = 0; i < lens; i++) {
-                msg += (i + 1) + ':' + JSON.parse(data.data[i].content).abstract + '\n';
+                msg += i + 1 + ':' + JSON.parse(data.data[i].content).abstract + '\n';
             }
             _send(textMsg(String(msg)));
         } else {
@@ -206,11 +204,11 @@ const context = {
     },
     async 历史上的今天() {
         const { data } = await axios.get('https://api.asilu.com/today');
-        let msg = ''
+        let msg = '';
         if (data.code == 200 && data.data.length > 0) {
             let lens = data.data.length > 8 ? 8 : data.data.length;
             for (let i = 0; i < lens; i++) {
-                msg += data.data[i].year + ':' + data.data[i].title+'\n';
+                msg += data.data[i].year + ':' + data.data[i].title + '\n';
             }
             _send(textMsg(String(msg)));
         } else {
@@ -226,14 +224,13 @@ const context = {
         }
     },
     功能() {
-        let msg = `管管目前只能做到下面的事哦~我一定会努力学习更多技能的呢~嘤嘤嘤~~~：\n1.>girl()\n2.>at(qq号,'内容')\n3.>百科('内容')\n4.>output('内容')\n5.>each(3,'内容')\n6.>guess('剪刀')\n7.>解释('hello')\n8.>名句()\n9.>提醒(qq号,'吃饭了',3000)\n10.>今日头条()\n11.>历史上的今天()\n12.>二次元()\n13.>boy()\n14.>学习资料()\n
-        `;
+        let msg = `管管目前只能做到下面的事哦~我一定会努力学习更多技能的呢~嘤嘤嘤~~~：\n1.>girl()\n2.>at(qq号,'内容')\n3.>百科('内容')\n4.>output('内容')\n5.>each(3,'内容')\n6.>guess('剪刀')\n7.>解释('hello')\n8.>名句()\n9.>提醒(qq号,'吃饭了',3000)\n10.>今日头条()\n11.>历史上的今天()\n12.>二次元()\n13.>boy()\n14.>学习资料()`;
         _send(textMsg(msg));
     },
     at(id, msg) {
         const message = new Message();
         message.addAt(id);
-        message.addText(' '+String(msg || ''));
+        message.addText(' ' + String(msg || ''));
         _send(message);
     },
     async 百科(msg) {
@@ -250,8 +247,8 @@ const context = {
 const keys = Object.keys(context).map(item => item + '=');
 const vm = new VM({
     timeout: 3000,
-    sandbox:context
-})
+    sandbox: context,
+});
 const adminContext = {
     ...context,
     on() {
@@ -265,10 +262,10 @@ const adminContext = {
     status() {
         _send(textMsg(`${status.on ? 'on' : 'off'}`));
     },
-    dpush(qq){
-        if(!qq)return
-        blist.push(qq)
-     },
+    dpush(qq) {
+        if (!qq) return;
+        blist.push(qq);
+    },
     释放犯人() {
         let qq = '';
         if (blist[0]) {
@@ -282,38 +279,42 @@ Object.freeze(context);
 Object.freeze(adminContext);
 const vmAdmin = new VM({
     timeout: 30000,
-    sandbox:adminContext
-})
-let blist=[]
+    sandbox: adminContext,
+});
+let blist = [];
 module.exports = async (data, next) => {
-    const { isAtMe, permissionText, id, memberName, groupId, groupName, messageChain, texts } = data
-    const text = texts.join("").trim("")
-    if(blist.includes(id))return
-    const prompt = text[0] + text[1];
-    let scriptText = text.substr(2)
+    const { isAtMe, permissionText, id, memberName, groupId, groupName, messageChain, texts } = data;
+    const text = texts.join('').trim('');
+    if (blist.includes(id)) return;
+    let prompt = text[0];
+    let scriptText = text.substr(1);
+    if(prompt == '管') {
+        prompt = text[0] + text[1];
+        scriptText = text.substr(2);
+    }
     scriptText = scriptText.replace(/（/g, '(');
     scriptText = scriptText.replace(/）/g, ')');
     scriptText = scriptText.replace(/‘|’/g, "'");
     scriptText = scriptText.replace(/“|”/g, '"');
     scriptText = scriptText.replace(/；/g, ';');
     scriptText = scriptText.replace(/，/g, ',');
-    if (!["#", ">", "管管"].includes(prompt)) return next()
-    current.groupId = groupId
-    current.id = id
-    if(/require|eval|Function|import|global/.test(text) || keys.find(item => text.replace(/ /g,'').indexOf(item) > -1)){
-        _send(textMsg(`丢雷楼某!想搞老子！已经将${id}加入黑名单! `))
-        blist.push(id)
-        return
-     }
-     try {
-     if (prompt == "#") {
-        if (!masterQQ.includes(id))  throw new Error("权限不足,非BOT管理员请用>作为提示符") 
-        vmAdmin.run(scriptText)
-     }
-     if (prompt == ">" || prompt == "管管") {
-        vm.run(scriptText)
-     }
-     } catch (e) {
-         _send(textMsg(String(e) + "\n@我获得帮助 输入>功能()获得函数列表"))
-     } 
-}                                                                  
+    if (!['#', '>', '管管'].includes(prompt)) return next();
+    current.groupId = groupId;
+    current.id = id;
+    if (/require|eval|Function|import|global/.test(text) || keys.find(item => text.replace(/ /g, '').indexOf(item) > -1)) {
+        _send(textMsg(`丢雷楼某!想搞老子！已经将${id}加入黑名单! `));
+        blist.push(id);
+        return;
+    }
+    try {
+        if (prompt == '#') {
+            if (!masterQQ.includes(id)) throw new Error('权限不足,非BOT管理员请用>作为提示符');
+            vmAdmin.run(scriptText);
+        }
+        if (prompt == '>' || prompt == '管管') {
+            vm.run(scriptText);
+        }
+    } catch (e) {
+        _send(textMsg(String(e) + '\n@我获得帮助 输入>功能()获得函数列表'));
+    }
+};
