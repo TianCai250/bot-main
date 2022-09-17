@@ -1,0 +1,13 @@
+{
+    "masterQQ": [
+        
+    ],
+    "qq": "",
+    "password": "",
+    "baseUrl": "http://localhost:8080",
+    "verifyKey": "",
+    "ruyi_appKey": "",
+    "ruyi_baseUrl": "http://api.ruyi.ai/v1/message",
+    "name": "管管",
+    "sname": "小管管"
+}

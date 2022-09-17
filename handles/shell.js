@@ -187,7 +187,9 @@ const context = {
         }
     },
     boy() {
-        _send(textMsg(String('死基佬！看nm的男人！')));
+        const msgArr = ['你看你妈呢?', 'NMSL!', '基佬滚一边去!', '三天之内杀了你!','不行,除非亲我一下~'];
+        const msg = msgArr[Math.floor(Math.random() * msgArr.length)];
+        _send(textMsg(String(msg)));
     },
     async 今日头条() {
         const { data } = await axios.get('http://is.snssdk.com/api/news/feed/v51/');
@@ -223,8 +225,34 @@ const context = {
             _send(message);
         }
     },
+    工具() {
+        let toolList = [
+            {
+                key: 1,
+                name: 'vscode插件:Element-UI Snippets',
+                url: '\nvue2饿了吗组件代码提示插件,只需输入table、form、button等就能获得完整组件提示\n',
+            },
+            {
+                key: 2,
+                name: 'vue3移动端脚手架:vue-mb-cli',
+                url: '\n快速搭建vue3移动端项目.\n安装:npm i vue-mb-cli -g\n使用:vue-mb create "项目名"\n',
+            },
+            {
+                key: 3,
+                name: 'vue2UI组件库:wl-ui',
+                url: '\nantd风格的vueUI组件库.\n安装:npm i wl-ui\n使用:npm官网搜索wl-ui,使用方法和ElementUI组件库一致\n',
+            },
+            {
+                key: 4,
+                name: '项目Github地址:https://github.com/TianCai250',
+                url: '\n以上项目代码均在本仓库,包括本机器人的代码',
+            },
+        ];
+        let msg = toolList.reduce((pre, cur) => `${pre}${cur.key}:${cur.name}\n${cur.url}\n`, '');
+        _send(textMsg(String(msg)));
+    },
     功能() {
-        let msg = `管管目前只能做到下面的事哦~我一定会努力学习更多技能的呢~嘤嘤嘤~~~：\n1.>girl()\n2.>at(qq号,'内容')\n3.>百科('内容')\n4.>output('内容')\n5.>each(3,'内容')\n6.>guess('剪刀')\n7.>解释('hello')\n8.>名句()\n9.>提醒(qq号,'吃饭了',3000)\n10.>今日头条()\n11.>历史上的今天()\n12.>二次元()\n13.>boy()\n14.>学习资料()`;
+        let msg = `管管目前只能做到下面的事哦~我一定会努力学习更多技能的呢~嘤嘤嘤~~~：\n1.>girl()\n2.>at(qq号,'内容')\n3.>百科('内容')\n4.>output('内容')\n5.>each(3,'内容')\n6.>guess('剪刀')\n7.>解释('hello')\n8.>名句()\n9.>提醒(qq号,'吃饭了',3000)\n10.>今日头条()\n11.>历史上的今天()\n12.>二次元()\n13.>boy()\n14.>学习资料()\n15.>工具()\n16.>执行(函数)`;
         _send(textMsg(msg));
     },
     at(id, msg) {
@@ -237,12 +265,15 @@ const context = {
         if (!msg) return;
         const { data } = await axios.get(`https://baike.baidu.com/item/${encodeURI(msg)}`);
         const $ = cheerio.load(data);
-        let s = $(`.para:lt(3)`).text().substring(0, 200).replace(' ', '');
+        let s = $(`.para:lt(3)`).text().substring(0, 400).replace(' ', '');
         _send(textMsg(s ? s : '未找到词条！'));
     },
     output(msg) {
         _send(textMsg(String(msg)));
     },
+    执行(fn) {
+        fn();
+    }
 };
 const keys = Object.keys(context).map(item => item + '=');
 const vm = new VM({
